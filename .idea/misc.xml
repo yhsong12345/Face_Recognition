@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Remote Python 3.9.0 (sftp://youhans@172.100.100.3:22/purestorage/project/youhans/minconda3/envs/fr/bin/python)" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.9.0 (sftp://youhans@172.100.100.3:22/purestorage/project/youhans/minconda3/envs/fr/bin/python)" project-jdk-type="Python SDK" />
+</project>
