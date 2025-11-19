@@ -71,7 +71,7 @@ def main(args):
                 save_top_k=3,
                 monitor="Validation loss",
                 mode="min",
-                filename="{epoch}_{step}_{Validation loss:.2f}.pt",
+                filename="{epoch}_{step}_{Validation loss:.2f}",
             ),
             ModelSummary(max_depth=3),
             LearningRateMonitor(logging_interval="epoch"),
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         help="number of epochs to train our network for",
     )
     parser.add_argument(
-        "--learning_rate", type=float, default=0.05, help="learning rate"
+        "--learning_rate", type=float, default=0.1, help="learning rate"
     )
     parser.add_argument("--batch_size", type=int, default=32, help="Batch Size")
     parser.add_argument("--image_size", type=int, default=224, help="image size")
