@@ -1,12 +1,9 @@
-import torch
-from torch.utils.data import Subset, DataLoader
-from data.preprocess import WiderFaceDetection, detection_collate
 import os
+
+import torch
 import torchvision.transforms as transforms
-
-
-
-
+from data.preprocess import WiderFaceDetection, detection_collate
+from torch.utils.data import DataLoader, Subset
 
 
 def create_ms1mv2_datasets(s, path):
@@ -22,16 +19,16 @@ def create_ms1mv2_datasets(s, path):
 
 
 def divide_dataset(evaluation):
-    f = open(evaluation, 'r')
+    f = open(evaluation, "r")
     lines = f.readlines()
     boundary = []
     prev = 0
     for i in range(len(lines)):
         line = lines[i]
-        line = line.split(' ')
+        line = line.split(" ")
         line = [i for i in line if i.strip()]
         ty = line[-1]
-        ty = ty.replace('\n', '')
+        ty = ty.replace("\n", "")
         if prev != ty:
             boundary.append(i)
             prev = ty
@@ -54,12 +51,19 @@ def create_data_loaders(dataset_train, dataset_valid, BATCH_SIZE):
     nw = os.cpu_count() // max(nd, 1)  # number of workers
     nw = min(8, nw)
 
-
     train_loader = DataLoader(
-        dataset_train, batch_size=BATCH_SIZE, shuffle=True, num_workers=nw
+        dataset_train,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=nw,
+        drop_last=True,
     )
     valid_loader = DataLoader(
-        dataset_valid, batch_size=BATCH_SIZE, shuffle=False, num_workers=nw
+        dataset_valid,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        num_workers=nw,
+        drop_last=True,
     )
 
     return train_loader, valid_loader

@@ -1,14 +1,15 @@
-import torch
-import numpy as np
-import torch.utils.data as data
-import cv2
 import os
+
+import cv2
+import numpy as np
+import torch
+import torch.utils.data as data
 import torchvision.transforms as transforms
 from PIL import Image
 
 
 class WiderFaceDetection(data.Dataset):
-    def __init__(self,folders_path, preproc=None, imgsz=640):
+    def __init__(self, folders_path, preproc=None, imgsz=640):
         self.preproc = preproc
         self.imgs_path = []
         self.words = []
@@ -16,23 +17,24 @@ class WiderFaceDetection(data.Dataset):
 
         self.num_classes = 0
 
-        self.img_transform = transforms.Compose([
-            transforms.Resize(self.imgsz),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=(0.1307,), std=(0.3081,))
-        ])
-
+        self.img_transform = transforms.Compose(
+            [
+                transforms.Resize(self.imgsz),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.1307,), std=(0.3081,)),
+            ]
+        )
 
         folders = os.listdir(folders_path)
-        for folder in folders:
-            identity = int(folder)
+        for i, folder in enumerate(folders):
+            if isinstance(folder, str):
+                identity = int(i)
             imgs_path = os.path.join(folders_path, folder)
             imgs = os.listdir(imgs_path)
             for img in imgs:
                 img_path = os.path.join(imgs_path, img)
                 self.imgs_path.append(img_path)
                 self.words.append(identity)
-
 
     def __len__(self):
         return len(self.imgs_path)
@@ -59,8 +61,6 @@ class WiderFaceDetection(data.Dataset):
         #     img, target = self.preproc(img, target)
 
         return self.img_transform(img), annotations
-
-
 
 
 def detection_collate(batch):
