@@ -20,7 +20,7 @@ def main(args):
     lr = args["learning_rate"]
     epochs = args["epochs"]
     batch_size = args["batch_size"]
-    imgsz = args["image_size"]
+    imgsz = (384, 128)
     model = args["model"]
     d = args["save_dir"]
     f = args["data"]
@@ -51,7 +51,7 @@ def main(args):
 
     wandb.login(key="2892bd003dbade283d8f143bd55ceebe4eaf5690")
 
-    wandb_logger = WandbLogger(project=project, name=name, log_model=False)
+    wandb_logger = WandbLogger(project=project, name=f"{model}_{name}", log_model=False)
 
     model = Face_Recognition(
         model_name=model, lr=lr, pretrained=False, num_classes=70, loss=name
@@ -68,10 +68,10 @@ def main(args):
         callbacks=[
             ModelCheckpoint(
                 dirpath=save_dir,
-                save_top_k=3,
+                save_top_k=1,
                 monitor="Validation loss",
                 mode="min",
-                filename="{epoch}_{step}_{Validation loss:.2f}",
+                filename="best",
             ),
             ModelSummary(max_depth=3),
             LearningRateMonitor(logging_interval="epoch"),
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         help="number of epochs to train our network for",
     )
     parser.add_argument(
-        "--learning_rate", type=float, default=0.1, help="learning rate"
+        "--learning_rate", type=float, default=0.001, help="learning rate"
     )
     parser.add_argument("--batch_size", type=int, default=32, help="Batch Size")
     parser.add_argument("--image_size", type=int, default=224, help="image size")

@@ -43,9 +43,9 @@ class Resnet(L.LightningModule):
         self.model = nn.Sequential(*modules)
 
         self.fc = nn.Sequential(
-            nn.BatchNorm1d(2048 * 7 * 7),
+            nn.BatchNorm1d(2048 * 12 * 4),
             nn.Dropout1d(0.4),
-            nn.Linear(2048 * 7 * 7, 512),
+            nn.Linear(2048 * 12 * 4, 512),
             nn.BatchNorm1d(512),
         )
 
@@ -102,7 +102,7 @@ class Face_Recognition(L.LightningModule):
         )
 
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer, milestones=[40, 56, 64], gamma=0.1
+            optimizer, milestones=[30, 56, 64], gamma=0.1
         )
 
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}

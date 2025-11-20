@@ -6,3 +6,4 @@ wandb/
 .nfs00fe000001d8e54d00002f3b
 outputs
 *.out
+cache

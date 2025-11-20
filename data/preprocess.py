@@ -19,7 +19,7 @@ class WiderFaceDetection(data.Dataset):
 
         self.img_transform = transforms.Compose(
             [
-                transforms.Resize(self.imgsz),
+                transforms.Resize((384, 128)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=(0.1307,), std=(0.3081,)),
             ]

@@ -29,7 +29,7 @@ export HF_HOME=./cache/huggingface
 export KAGGLEHUB_CACHE=./cache/kagglehub
 
 
-python train.py --data /purestorage/AILAB/AI_4/datasets/cctv/image/stage1_data/2025-10-15 \
-    --model SE_LResnet101 --name arcface
+python clip_reid_train.py --data /purestorage/AILAB/AI_4/datasets/cctv/image/stage1_data/2025-10-15 \
+
 
 echo Done
