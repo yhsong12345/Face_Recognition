@@ -2,8 +2,11 @@ import argparse
 import logging
 import os
 import random
+from pathlib import Path
+from typing import List, Optional, Tuple, Union
 
 import lightning as L
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -128,6 +131,81 @@ class CLIPReIDModel(L.LightningModule):
         feat = F.normalize(feat, dim=-1)
         bn_feat, cls_score = self.reid_head(feat)
         return feat, bn_feat, cls_score
+
+    def _setup_transform(self):
+        self.preprocess = CLIPFeatureExtractor.from_pretrained(self.model_name)
+
+    def extract_embedding(
+        self, image: Union[Path, str, Image.Image, np.ndarray]
+    ) -> np.ndarray:
+        """
+        단일 이미지에서 임베딩 추출
+
+        Args:
+            image: 이미지 (파일 경로, PIL Image, 또는 numpy 배열)
+
+        Returns:
+            임베딩 벡터 (numpy 배열)
+        """
+        # 이미지 로드 및 전처리
+        if isinstance(image, str):
+            image = Image.open(image).convert("RGB")
+            image = np.asarray(image)[:, :, ::-1]  # RGB -> BGR
+            image = self.preprocess(image, return_tensors="pt")
+            images = image["pixel_values"].squeeze(0)
+
+        elif isinstance(image, np.ndarray):
+            image = self.preprocess(image, return_tensors="pt")
+            images = image["pixel_values"].squeeze(0)
+
+        elif isinstance(image, torch.Tensor):
+            if image.dim() == 3:
+                images = image.unsqueeze(0)
+            images = images.to(self.device)
+
+        # 임베딩 추출
+        with torch.no_grad():
+            embeddings, _, _ = self.forward(images)
+
+        return embeddings
+
+    def extract_embeddings_batch(
+        self, images: List[Union[Path, str, Image.Image, np.ndarray]]
+    ) -> np.ndarray:
+        """
+        배치 이미지에서 임베딩 추출
+
+        Args:
+            images: 이미지 리스트
+
+        Returns:
+            임베딩 행렬 (numpy 배열)
+        """
+        # imgs = []
+        # for image in images:
+        #     if isinstance(image, str) or isinstance(image, Path):
+        #         image = Image.open(image).convert('RGB')
+        #         image = np.asarray(image)[:, :, ::-1]
+        #     elif isinstance(image, np.ndarray):
+        #         image = self.to_pil(image)
+        #     else:
+        #         raise TypeError('Elements must be str or numpy.ndarray')
+        #     image = self.preprocess(image)
+        #     image = image.unsqueeze(0)
+        #     imgs.append(image)
+        # imgs = torch.stack(imgs, dim=0).to(self.device)
+        images = [
+            self.preprocess(Image.open(p).convert("RGB"), return_tensors="pt")[
+                "pixel_values"
+            ].squeeze(0)
+            for p in images
+        ]
+        images = torch.stack(images).cuda()  # shape: (B, 3, 256, 128)
+
+        with torch.no_grad():
+            embeddings, _, _ = self.forward(images)
+
+        return embeddings
 
 
 # class CLIPReIDModel(L.LightningModule):
